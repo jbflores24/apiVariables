@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ProducerController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -22,3 +23,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::apiResource('/role', RoleController::class);
 Route::apiResource('/user',UserController::class);
+Route::apiResource('/producer', ProducerController::class);

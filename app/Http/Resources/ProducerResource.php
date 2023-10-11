@@ -14,6 +14,19 @@ class ProducerResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id'=>$this->id,
+            'user_id'=>$this->user_id,
+            'usuario'=>$this->user,
+            'calle'=>$this->calle,
+            'numero'=>$this->numero,
+            'colonia'=>$this->colonia,
+            'cp'=>$this->cp,
+            'municipio'=>$this->municipio,
+            'agencia'=>$this->agencia,
+            'estado'=>$this->estado,
+            'telPrincipal'=>$this->telPrincipal,
+            'telSecundario'=>$this->telSecundario,
+        ];
     }
 }
