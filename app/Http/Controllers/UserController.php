@@ -20,10 +20,18 @@ class UserController extends Controller
         return ApiResponse::success('Lista de usuarios',200,$usuarios);
     }
 
-    public function show (User $user){
+    public function show ($id){
         try {
-            $rol = new UserCollection(User::find($user));//Role::findOrFail($id);
-            return ApiResponse::success('Registro encontrado', 200, $rol);
+            $usuario = User::findOrFail($id);
+            $usuario = [
+                'id' => $usuario->id,
+                'rfc' => $usuario->rfc,
+                'name' => $usuario->name,
+                'email' => $usuario->email,
+                'rol'=> $usuario->roles,
+                'producer'=> $usuario->producer,
+            ];
+            return ApiResponse::success('Registro encontrado', 200, $usuario);
         } catch(ModelNotFoundException $e) {
             return ApiResponse::error($e->getMessage(),404);
         }

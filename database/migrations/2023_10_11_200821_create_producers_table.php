@@ -18,10 +18,10 @@ return new class extends Migration
             $table->string('colonia');
             $table->string('cp');
             $table->string('municipio');
-            $table->string('agencia');
+            $table->string('agencia')->nullable;
             $table->string('estado');
             $table->string('telPrincipal');
-            $table->string('telSecundario');
+            $table->string('telSecundario')->nullable;
             $table->unsignedBigInteger('user_id')->unique();
             $table->foreign('user_id')
                 ->references('id')

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\EstanqueController;
 use App\Http\Controllers\ProducerController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
@@ -26,3 +27,5 @@ Route::apiResource('/role', RoleController::class);
 Route::apiResource('/user',UserController::class);
 Route::apiResource('/producer', ProducerController::class);
 Route::apiResource('/variable',VariableController::class);
+Route::apiResource('/estanque',EstanqueController::class);
+

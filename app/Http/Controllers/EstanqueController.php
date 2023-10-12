@@ -3,15 +3,14 @@
 namespace App\Http\Controllers;
 
 use Exception;
-use App\Models\Role;
+use App\Models\Estanque;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use App\Http\Responses\ApiResponse;
-use App\Http\Resources\RoleCollection;
+use App\Http\Resources\EstanqueCollection;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
-class RoleController extends Controller
+class EstanqueController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -19,11 +18,13 @@ class RoleController extends Controller
     public function index()
     {
         try {
-            $roles = new RoleCollection(Role::all());
-            return ApiResponse::success ('Listado de roles', 200, $roles);
+            $estanques = new EstanqueCollection(Estanque::all());
+            return ApiResponse::success ('Listado de estanques', 200, $estanques);
         }catch (Exception $e){
             return ApiResponse::error($e->getMessage(), 500);
         }
+        $usuarios = Estanque::all();
+        return ApiResponse::success('Lista de estanques',200,$usuarios);
     }
 
     /**
@@ -33,9 +34,11 @@ class RoleController extends Controller
     {
         try {
             $request->validate([
-                'nombre' => 'required|unique:roles'
+                'nombre' => 'required|min:1|max:255',
+                'descripcion'=>'max:255',
+                'producer_id'=>'required'
             ]);
-            $rol = Role::create($request->all());
+            $rol = Estanque::create($request->all());
             return ApiResponse::success('Registro agregado', 201, $rol);
         } catch (ValidationException $e) {
             return ApiResponse::error($e->getMessage(),422);
@@ -48,10 +51,19 @@ class RoleController extends Controller
     public function show($id)
     {
         try {
-            $rol = Role::findOrFail($id);
-            return ApiResponse::success('Registro encontrado', 200, $rol);
+            //$est = new EstanqueCollection(Estanque::find($estanque));//Role::findOrFail($id);
+            $estanque = Estanque::findOrFail($id);
+            $estanque = [
+                'id' => $estanque->id,
+                'nombre'=> $estanque->nombre,
+                'descripcion'=> $estanque->descripcion,
+                'producer_id'=>$estanque->producer_id,
+                'productor'=>$estanque->producer,
+                'usuario' => $estanque->producer->user
+            ];
+            return ApiResponse::success('Registro encontrado', 200, $estanque);
         } catch(ModelNotFoundException $e) {
-            return ApiResponse::error($e->getMessage(),404);
+            return ApiResponse::error('No Encontrado',404);
         }
     }
 
@@ -59,17 +71,16 @@ class RoleController extends Controller
      * Update the specified resource in storage.
      */
     public function update(Request $request, $id)
-    {               //return response()->json([$request->nombre]);
+    {
         try {
-            $rol = Role::findOrFail($id);
+            $estanque = Estanque::findOrFail($id);
             $request->validate([
-                'nombre' => [
-                    'required',
-                    Rule::unique('roles')->ignore($rol)
-                ]
+                'nombre' => 'required|min:1|max:255',
+                'descripcion' => 'max:255',
+                'user_id'=>'required'
             ]);
-            $rol->update($request->all());
-            return ApiResponse::success('Registro actualizado',200,$rol);
+            $estanque->update($request->all());
+            return ApiResponse::success('Registro actualizado',200,$estanque);
         }catch (ModelNotFoundException $e) {
             return ApiResponse::error($e->getMessage(), 404);
         } catch (Exception $e) {
@@ -83,8 +94,8 @@ class RoleController extends Controller
     public function destroy($id)
     {
         try {
-            $rol = Role::findOrFail($id);
-            $rol->delete();
+            $estanque = Estanque::findOrFail($id);
+            $estanque->delete();
             return ApiResponse::error('Registro eliminado',200);
         }catch(ModelNotFoundException $e){
             return ApiResponse::error($e->getMessage(),404);

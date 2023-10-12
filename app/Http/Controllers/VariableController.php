@@ -42,11 +42,11 @@ class VariableController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Variable $variable)
+    public function show($id)
     {
         try {
-            $rol = new VariableCollection(Variable::find($variable));//Role::findOrFail($id);
-            return ApiResponse::success('Registro encontrado', 200, $rol);
+            $variable = Variable::findOrFail($id);
+            return ApiResponse::success('Registro encontrado', 200, $variable);
         } catch(ModelNotFoundException $e) {
             return ApiResponse::error($e->getMessage(),404);
         }

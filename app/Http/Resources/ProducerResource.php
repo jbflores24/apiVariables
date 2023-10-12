@@ -27,6 +27,7 @@ class ProducerResource extends JsonResource
             'estado'=>$this->estado,
             'telPrincipal'=>$this->telPrincipal,
             'telSecundario'=>$this->telSecundario,
+            'estanques' => $this->estanques,
         ];
     }
 }

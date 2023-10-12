@@ -22,11 +22,26 @@ class ProducerController extends Controller
         }
     }
 
-    public function show(Producer $producer)
+    public function show($id)
     {
         try {
-            $rol = new ProducerCollection(Producer::find($producer));//Role::findOrFail($id);
-            return ApiResponse::success('Registro encontrado', 200, $rol);
+            $producer = Producer::findOrFail($id);
+            $producer = [
+                'id'=>$producer->id,
+                'user_id'=>$producer->user_id,
+                'usuario'=>$producer->user,
+                'calle'=>$producer->calle,
+                'numero'=>$producer->numero,
+                'colonia'=>$producer->colonia,
+                'cp'=>$producer->cp,
+                'municipio'=>$producer->municipio,
+                'agencia'=>$producer->agencia,
+                'estado'=>$producer->estado,
+                'telPrincipal'=>$producer->telPrincipal,
+                'telSecundario'=>$producer->telSecundario,
+                'estanques' => $producer->estanques,
+            ];
+            return ApiResponse::success('Registro encontrado', 200, $producer);
         } catch(ModelNotFoundException $e) {
             return ApiResponse::error($e->getMessage(),404);
         }
