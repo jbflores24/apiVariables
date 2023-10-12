@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProducerController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\VariableController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -24,3 +25,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::apiResource('/role', RoleController::class);
 Route::apiResource('/user',UserController::class);
 Route::apiResource('/producer', ProducerController::class);
+Route::apiResource('/variable',VariableController::class);

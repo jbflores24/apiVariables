@@ -17,7 +17,8 @@ class Producer extends Model
         'agencia',
         'estado',
         'telPrincipal',
-        'telSecundario'
+        'telSecundario',
+        'user_id'
     ];
 
     public function user(){
