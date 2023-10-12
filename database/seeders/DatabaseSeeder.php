@@ -18,5 +18,6 @@ class DatabaseSeeder extends Seeder
         $this->call(ProducerSeeder::class);
         $this->call(VariableSeeder::class);
         $this->call(EstanqueSeeder::class);
+        $this->call(RegisterSeeder::class);
     }
 }

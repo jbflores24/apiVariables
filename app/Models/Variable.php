@@ -10,4 +10,8 @@ class Variable extends Model
     use HasFactory;
 
     protected $fillable = ['nombre'];
+
+    public function registers(){
+        return $this->hasMany(Register::class);
+    }
 }

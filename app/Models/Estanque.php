@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Estanque extends Model
 {
     use HasFactory;
-    
+
     protected $fillable = [
         'nombre',
         'descripcion',
@@ -17,5 +17,9 @@ class Estanque extends Model
 
     public function producer(){
         return $this->belongsTo(Producer::class);
+    }
+
+    public function registers(){
+        return $this->hasMany(Register::class);
     }
 }

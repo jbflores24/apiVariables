@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\EstanqueController;
 use App\Http\Controllers\ProducerController;
+use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VariableController;
@@ -28,4 +29,6 @@ Route::apiResource('/user',UserController::class);
 Route::apiResource('/producer', ProducerController::class);
 Route::apiResource('/variable',VariableController::class);
 Route::apiResource('/estanque',EstanqueController::class);
+Route::apiResource('/register',RegisterController::class);
+
 

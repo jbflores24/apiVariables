@@ -52,4 +52,8 @@ class User extends Authenticatable
         return $this->belongsToMany(Role::class);
     }
 
+    public function registers(){
+        return $this->hasMany(Register::class);
+    }
+
 }
