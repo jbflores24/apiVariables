@@ -4,6 +4,7 @@ use App\Http\Controllers\EstanqueController;
 use App\Http\Controllers\ProducerController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\RoleUserController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VariableController;
 use Illuminate\Http\Request;
@@ -30,5 +31,8 @@ Route::apiResource('/producer', ProducerController::class);
 Route::apiResource('/variable',VariableController::class);
 Route::apiResource('/estanque',EstanqueController::class);
 Route::apiResource('/register',RegisterController::class);
+Route::apiResource('/roleuser', RoleUserController::class);
+Route::get('/getProducer',[UserController::class,'getProducer']);
+Route::get('/getProducerUserId/{id}',[ProducerController::class,'getProducerUserId']);
 
 

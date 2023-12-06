@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Http\Responses\ApiResponse;
 use App\Http\Resources\ProducerCollection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
@@ -99,6 +100,17 @@ class ProducerController extends Controller
             return ApiResponse::error($e->getMessage(), 404);
         } catch (Exception $e){
             return ApiResponse::error($e->getMessage(), 422);
+        }
+    }
+
+    public function getProducerUserId ($user_id){
+        try{
+            $producerUserId = DB::table('producers')
+                ->where('producers.user_id',$user_id)
+                ->get();
+            return ApiResponse::success('Registro Encontrado',200,$producerUserId);
+        } catch (Exception $e){
+            return ApiResponse::error ($e->getMessage(),422);
         }
     }
 }

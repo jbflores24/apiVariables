@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
 use App\Http\Responses\ApiResponse;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Resources\UserCollection;
-use Exception;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -79,5 +80,20 @@ class UserController extends Controller
         } catch (Exception $e) {
             return ApiResponse::error ($e->getMessage(), 422);
         }
+    }
+
+    public function getProducer(){
+        try{
+            $users_rol_producer = DB::table('users')
+                ->join('role_user','users.id','=','role_user.user_id')
+                ->select('*')
+                ->where('role_user.role_id',3)
+                ->orderBy('users.id')
+                ->get();
+            return ApiResponse::success('Listado de usuarios con el rol de productor', 200, $users_rol_producer);
+        } catch (ModelNotFoundException $e) {
+            ApiResponse::error($e->getMessage(),404);
+        }
+
     }
 }
