@@ -77,7 +77,7 @@ class EstanqueController extends Controller
             $request->validate([
                 'nombre' => 'required|min:1|max:255',
                 'descripcion' => 'max:255',
-                'user_id'=>'required'
+                'producer_id'=>'required'
             ]);
             $estanque->update($request->all());
             return ApiResponse::success('Registro actualizado',200,$estanque);

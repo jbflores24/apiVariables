@@ -105,12 +105,19 @@ class ProducerController extends Controller
 
     public function getProducerUserId ($user_id){
         try{
-            $producerUserId = DB::table('producers')
+            /*$producerUserId = DB::table('producers')
                 ->where('producers.user_id',$user_id)
-                ->get();
+                ->get();*/
+            /*$producerUserId = DB::table('producers')
+                ->join ('estanques', 'producers.id','=','estanques.producer_id')
+                ->select ('*')
+                ->where ('producers.user_id',$user_id)
+                ->get();*/
+            $producerUserId = new ProducerCollection(Producer::query()->where('user_id',$user_id)->get());
             return ApiResponse::success('Registro Encontrado',200,$producerUserId);
-        } catch (Exception $e){
-            return ApiResponse::error ($e->getMessage(),422);
+        } catch (Exception $e) {
+            return ApiResponse::error($e->getMessage(), 422);
         }
+
     }
 }
