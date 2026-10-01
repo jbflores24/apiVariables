@@ -15,16 +15,14 @@ class EstanqueController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $estanques = new EstanqueCollection(Estanque::all());
+            $estanques = new EstanqueCollection(Estanque::visiblePara($request->user())->get());
             return ApiResponse::success ('Listado de estanques', 200, $estanques);
         }catch (Exception $e){
             return ApiResponse::error($e->getMessage(), 500);
         }
-        $usuarios = Estanque::all();
-        return ApiResponse::success('Lista de estanques',200,$usuarios);
     }
 
     /**
@@ -35,24 +33,23 @@ class EstanqueController extends Controller
         try {
             $request->validate([
                 'nombre' => 'required|min:1|max:255',
-                'descripcion'=>'max:255',
-                'producer_id'=>'required'
+                'descripcion'=>'nullable|max:255',
+                'producer_id'=>'required|exists:producers,id'
             ]);
             $rol = Estanque::create($request->all());
             return ApiResponse::success('Registro agregado', 201, $rol);
         } catch (ValidationException $e) {
-            return ApiResponse::error($e->getMessage(),422);
+            return ApiResponse::error($e->getMessage(),422, $e->errors());
         }
     }
 
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
         try {
-            //$est = new EstanqueCollection(Estanque::find($estanque));//Role::findOrFail($id);
-            $estanque = Estanque::findOrFail($id);
+            $estanque = Estanque::visiblePara($request->user())->findOrFail($id);
             $estanque = [
                 'id' => $estanque->id,
                 'nombre'=> $estanque->nombre,
@@ -76,13 +73,15 @@ class EstanqueController extends Controller
             $estanque = Estanque::findOrFail($id);
             $request->validate([
                 'nombre' => 'required|min:1|max:255',
-                'descripcion' => 'max:255',
-                'producer_id'=>'required'
+                'descripcion' => 'nullable|max:255',
+                'producer_id'=>'required|exists:producers,id'
             ]);
             $estanque->update($request->all());
             return ApiResponse::success('Registro actualizado',200,$estanque);
         }catch (ModelNotFoundException $e) {
             return ApiResponse::error($e->getMessage(), 404);
+        } catch (ValidationException $e) {
+            return ApiResponse::error($e->getMessage(), 422, $e->errors());
         } catch (Exception $e) {
             return ApiResponse::error ($e->getMessage(), 422);
         }
@@ -96,7 +95,7 @@ class EstanqueController extends Controller
         try {
             $estanque = Estanque::findOrFail($id);
             $estanque->delete();
-            return ApiResponse::error('Registro eliminado',200);
+            return ApiResponse::success('Registro eliminado',200);
         }catch(ModelNotFoundException $e){
             return ApiResponse::error($e->getMessage(),404);
         }

@@ -4,10 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Responses\ApiResponse;
 use App\Models\RoleUser;
-use Dotenv\Exception\ValidationException;
+use Illuminate\Validation\ValidationException;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 
 class RoleUserController extends Controller
@@ -27,14 +28,11 @@ class RoleUserController extends Controller
     public function store(Request $request)
     {
         try {
-            $request->validate([
-                'role_id' => 'required',
-                'user_id' => 'required',
-            ]);
-            $role_user = RoleUser::create($request->all());
+            $request->validate($this->rules($request));
+            $role_user = RoleUser::create($request->only(['role_id', 'user_id']));
             return ApiResponse::success('Registro agregado', 201, $role_user);
         } catch (ValidationException $e){
-            return ApiResponse::error ($e->getMessage(),404);
+            return ApiResponse::error ($e->getMessage(),422, $e->errors());
         }
     }
 
@@ -58,16 +56,13 @@ class RoleUserController extends Controller
     {
         try {
             $role_user = RoleUser::findOrFail($id);
-            $request->validate(
-                [
-                    'role_id' => 'required',
-                    'user_id' => 'required'
-                ]
-            );
-            $role_user->update($request->all());
+            $request->validate($this->rules($request, $role_user));
+            $role_user->update($request->only(['role_id', 'user_id']));
             return ApiResponse::success('registro editado',200,$role_user);
         } catch (ModelNotFoundException $e) {
             return ApiResponse::error($e->getMessage(),404);
+        } catch (ValidationException $e) {
+            return ApiResponse::error($e->getMessage(), 422, $e->errors());
         } catch (Exception $e) {
             return ApiResponse::error($e->getMessage(),422);
         }
@@ -85,5 +80,20 @@ class RoleUserController extends Controller
         } catch (ModelNotFoundException $e){
             return ApiResponse::error($e->getMessage(),404);
         }
+    }
+
+    /**
+     * El rol y el usuario deben existir y el usuario no puede tener el mismo rol dos veces.
+     */
+    private function rules(Request $request, $role_user = null)
+    {
+        $unico = Rule::unique('role_user')->where('role_id', $request->input('role_id'));
+        if ($role_user) {
+            $unico->ignore($role_user);
+        }
+        return [
+            'role_id' => 'required|exists:roles,id',
+            'user_id' => ['required', 'exists:users,id', $unico],
+        ];
     }
 }

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('estanques', function (Blueprint $table) {
             $table->id();
             $table->string('nombre');
-            $table->string('descripcion')->nullable;
+            $table->string('descripcion')->nullable();
             $table->unsignedBigInteger('producer_id');
             $table->foreign('producer_id')
                 ->references('id')

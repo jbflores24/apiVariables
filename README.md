@@ -1,66 +1,159 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# API Variables
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+API REST para la captura de variables físicas (temperatura, oxígeno, pH, turbidez) en estanques
+acuícolas de la región del Istmo de Tehuantepec (Instituto Tecnológico de Salina Cruz).
+Es el backend de la aplicación móvil `appVariables` (Ionic + Angular).
 
-## About Laravel
+Construida con **Laravel 10** y **Laravel Sanctum** (autenticación por token).
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Instalación
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Requisitos: PHP 8.1+, Composer y MySQL.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+```bash
+composer install
+cp .env.example .env          # configurar DB_DATABASE, DB_USERNAME, DB_PASSWORD
+php artisan key:generate
+php artisan migrate:fresh --seed
+php artisan serve --host=0.0.0.0 --port=8000
+```
 
-## Learning Laravel
+Con `--host=0.0.0.0` la API queda accesible desde otros dispositivos de la red. En un celular
+**no** se usa `localhost`: en la app configura la IP de la computadora, por ejemplo
+`http://192.168.1.50:8000/api`.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### Usuarios de prueba (seeders)
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+Todos con contraseña `1234`:
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+| Usuario | Email | Roles |
+|---|---|---|
+| 1 | jbflores24@hotmail.com | Administrador, Técnico |
+| 2 | maria@hotmail.com | Técnico |
+| 3 | miguel@hotmail.com | Productor |
+| 4 | mauricio@gmail.com | Administrador |
 
-## Laravel Sponsors
+## Roles
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+| Rol | Puede |
+|---|---|
+| **Administrador** | Todo: usuarios, roles, productores, estanques, variables y registros de todos. |
+| **Técnico** | Consultar todos los productores, estanques y registros; capturar mediciones. |
+| **Productor** | Consultar solo su información y sus estanques; capturar mediciones en sus estanques. |
 
-### Premium Partners
+Cualquier usuario ve además los registros que él mismo capturó. Solo el autor de un registro
+o un Administrador pueden editarlo o eliminarlo.
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+## Formato de respuesta
 
-## Contributing
+Todas las respuestas (incluidos los errores) tienen la misma forma:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```json
+{ "message": "Texto", "statusCode": 200, "error": false, "data": { } }
+```
 
-## Code of Conduct
+| Código | Significado |
+|---|---|
+| 200 / 201 | Correcto / creado |
+| 401 | Sin token o token inválido → volver al login |
+| 403 | El rol del usuario no tiene permiso |
+| 404 | No existe (o no es visible para el usuario) |
+| 422 | Error de validación; `data` trae los errores por campo: `{ "email": ["..."] }` |
+| 429 | Demasiados intentos de login (máx. 10 por minuto) |
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Se recomienda enviar el body como **JSON** (`Content-Type: application/json`).
 
-## Security Vulnerabilities
+## Autenticación
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+1. `POST /api/login` con `{ "email", "password" }` devuelve:
 
-## License
+   ```json
+   { "data": { "token": "1|abc...", "user": { "id": 3, "name": "...", "roles": ["Productor"], "producer": { } } } }
+   ```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+2. En cada petición enviar el encabezado `Authorization: Bearer <token>`.
+3. `POST /api/logout` invalida el token.
+
+## Endpoints
+
+Todas las rutas llevan el prefijo `/api` y, salvo `login`, requieren token.
+
+### Sesión
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| POST | `/login` | Inicia sesión; devuelve token y perfil |
+| GET | `/me` | Perfil del usuario autenticado (roles y datos de productor) |
+| PUT | `/me/password` | Cambiar contraseña: `password_actual`, `password`, `password_confirmation` |
+| POST | `/logout` | Cierra la sesión actual |
+
+### Consulta (cualquier rol; el Productor solo ve lo suyo)
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| GET | `/producer`, `/producer/{id}` | Productores con su usuario y estanques |
+| GET | `/getProducerUserId/{user_id}` | Productor asociado a un usuario |
+| GET | `/estanque`, `/estanque/{id}` | Estanques |
+| GET | `/variable`, `/variable/{id}` | Variables que se miden |
+
+### Registros de mediciones
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| GET | `/register` | Listado paginado. Filtros: `estanque_id`, `variable_id`, `desde`, `hasta` (`Y-m-d`), `per_page` (máx. 200), `page` |
+| GET | `/register/{id}` | Un registro |
+| POST | `/register` | Un valor: `estanque_id`, `variable_id`, `valor` |
+| POST | `/register/lote` | Varios valores de un estanque en una sola operación (todo o nada) |
+| PUT | `/register/{id}` | Editar (autor o Administrador) |
+| DELETE | `/register/{id}` | Eliminar (autor o Administrador) |
+| GET | `/estadisticas` | Resumen por variable; mismos filtros que `/register` |
+
+El usuario del registro siempre se toma del token; no hace falta enviar `user_id`.
+
+Ejemplo de captura en lote:
+
+```json
+POST /api/register/lote
+{
+  "estanque_id": 5,
+  "valores": [
+    { "variable_id": 1, "valor": 26.4 },
+    { "variable_id": 2, "valor": 6.1 },
+    { "variable_id": 3, "valor": 7.2 },
+    { "variable_id": 4, "valor": 12 }
+  ]
+}
+```
+
+Respuesta del listado paginado (`data`):
+
+```json
+{
+  "registros": [ { "id": 9, "valor": 23.1, "estanque_id": 3, "estanque": {}, "variable_id": 4, "variable": {}, "user_id": 1, "usuario": {}, "fecha": "2026-10-01T12:00:00.000000Z" } ],
+  "paginacion": { "pagina_actual": 1, "por_pagina": 50, "total": 9, "ultima_pagina": 1 }
+}
+```
+
+Respuesta de estadísticas (`data`, una fila por variable):
+
+```json
+[ { "variable_id": 1, "nombre": "Temperatura", "total": 12, "minimo": 19.5, "maximo": 27.1, "promedio": 23.4, "ultimo_valor": 24.0, "ultima_fecha": "..." } ]
+```
+
+### Administración (solo Administrador)
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| CRUD | `/user` | Usuarios. Al editar, si `password` va vacío se conserva la actual |
+| CRUD | `/role` | Roles |
+| CRUD | `/roleuser` | Asignación de roles (`role_id`, `user_id`); `GET /roleuser/{user_id}` lista los roles de un usuario |
+| GET | `/getProducer` | Usuarios con rol Productor |
+| POST/PUT/DELETE | `/producer`, `/estanque`, `/variable` | Alta, edición y baja |
+
+## Pruebas
+
+```bash
+php artisan test
+```
+
+Usan SQLite en memoria (no tocan la base de datos MySQL).

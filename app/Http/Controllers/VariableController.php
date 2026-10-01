@@ -35,7 +35,7 @@ class VariableController extends Controller
             $rol = Variable::create($request->all());
             return ApiResponse::success('Registro agregado', 201, $rol);
         } catch (ValidationException $e) {
-            return ApiResponse::error($e->getMessage(),422);
+            return ApiResponse::error($e->getMessage(),422, $e->errors());
         }
     }
 
@@ -69,6 +69,8 @@ class VariableController extends Controller
             return ApiResponse::success('Registro actualizado',200,$variable);
         }catch (ModelNotFoundException $e) {
             return ApiResponse::error($e->getMessage(), 404);
+        } catch (ValidationException $e) {
+            return ApiResponse::error($e->getMessage(), 422, $e->errors());
         } catch (Exception $e) {
             return ApiResponse::error ($e->getMessage(), 422);
         }
@@ -82,7 +84,7 @@ class VariableController extends Controller
         try {
             $variable = Variable::findOrFail($id);
             $variable->delete();
-            return ApiResponse::error('Registro eliminado',200);
+            return ApiResponse::success('Registro eliminado',200);
         }catch(ModelNotFoundException $e){
             return ApiResponse::error($e->getMessage(),404);
         }
