@@ -31,16 +31,12 @@ class RegisterController extends Controller
     public function store(Request $request)
     {
         try {
-            $request->validate([
-                'estanque_id' => 'required',
-                'variable_id' => 'required',
-                'user_id' => 'required',
-                'valor' => 'required',
-            ]);
-            $rol = Register::create($request->all());
+            $datos = $request->validate($this->rules());
+            $datos['user_id'] = $request->user()->id;
+            $rol = Register::create($datos);
             return ApiResponse::success('Registro agregado', 201, $rol);
         } catch (ValidationException $e) {
-            return ApiResponse::error($e->getMessage(),422);
+            return ApiResponse::error($e->getMessage(),422, $e->errors());
         }
     }
 
@@ -74,16 +70,16 @@ class RegisterController extends Controller
     {
         try {
             $registro = Register::findOrFail($id);
-            $request->validate([
-                'estanque_id' => 'required',
-                'variable_id' => 'required',
-                'user_id' => 'required',
-                'valor' => 'required',
-            ]);
-            $registro->update($request->all());
+            if (!$this->puedeModificar($request, $registro)) {
+                return ApiResponse::error('No autorizado', 403);
+            }
+            $datos = $request->validate($this->rules());
+            $registro->update($datos);
             return ApiResponse::success('Registro editado', 200, $registro);
         } catch(ModelNotFoundException $e) {
             return ApiResponse::error('No Encontrado',404);
+        } catch (ValidationException $e) {
+            return ApiResponse::error($e->getMessage(),422, $e->errors());
         } catch (Exception $e) {
             return ApiResponse::error($e->getMessage(),500);
         }
@@ -92,14 +88,35 @@ class RegisterController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         try {
             $rol = Register::findOrFail($id);
+            if (!$this->puedeModificar($request, $rol)) {
+                return ApiResponse::error('No autorizado', 403);
+            }
             $rol->delete();
-            return ApiResponse::error('Registro eliminado',200);
+            return ApiResponse::success('Registro eliminado',200);
         }catch(ModelNotFoundException $e){
             return ApiResponse::error($e->getMessage(),404);
         }
+    }
+
+    private function rules()
+    {
+        return [
+            'estanque_id' => 'required|exists:estanques,id',
+            'variable_id' => 'required|exists:variables,id',
+            'valor' => 'required|numeric',
+        ];
+    }
+
+    /**
+     * Solo el usuario que capturó el registro o un administrador pueden modificarlo.
+     */
+    private function puedeModificar(Request $request, Register $registro)
+    {
+        $user = $request->user();
+        return (int) $registro->user_id === (int) $user->id || $user->hasRole('Administrador');
     }
 }

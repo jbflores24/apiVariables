@@ -56,4 +56,8 @@ class User extends Authenticatable
         return $this->hasMany(Register::class);
     }
 
+    public function hasRole(...$roles){
+        return $this->roles()->whereIn('nombre', $roles)->exists();
+    }
+
 }

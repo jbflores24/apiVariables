@@ -82,7 +82,7 @@ class VariableController extends Controller
         try {
             $variable = Variable::findOrFail($id);
             $variable->delete();
-            return ApiResponse::error('Registro eliminado',200);
+            return ApiResponse::success('Registro eliminado',200);
         }catch(ModelNotFoundException $e){
             return ApiResponse::error($e->getMessage(),404);
         }

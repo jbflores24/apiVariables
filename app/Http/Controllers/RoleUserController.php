@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Responses\ApiResponse;
 use App\Models\RoleUser;
-use Dotenv\Exception\ValidationException;
+use Illuminate\Validation\ValidationException;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
@@ -34,7 +34,7 @@ class RoleUserController extends Controller
             $role_user = RoleUser::create($request->all());
             return ApiResponse::success('Registro agregado', 201, $role_user);
         } catch (ValidationException $e){
-            return ApiResponse::error ($e->getMessage(),404);
+            return ApiResponse::error ($e->getMessage(),422, $e->errors());
         }
     }
 
