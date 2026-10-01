@@ -39,7 +39,7 @@ class UserController extends Controller
     public function store (Request $request){
         try {
             $request->validate([
-                'name' => 'required|max:30',
+                'name' => 'required|max:100',
                 'rfc' => 'required|unique:users|min:10|max:13',
                 'email' => 'required|unique:users|email|max:60',
                 'password' => 'required|min:4',
@@ -66,7 +66,7 @@ class UserController extends Controller
         try {
             $user = User::findOrFail($id);
             $request->validate([
-                'name' => 'required|max:30',
+                'name' => 'required|max:100',
                 'rfc' => ['required', Rule::unique('users')->ignore($user),'min:10','max:13'],
                 'email' => ['required',Rule::unique('users')->ignore($user),'email','max:60'],
                 'password' => 'nullable|min:4',
