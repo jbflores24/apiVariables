@@ -8,25 +8,24 @@ use Illuminate\Http\Request;
 use App\Http\Responses\ApiResponse;
 use App\Http\Resources\ProducerCollection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 class ProducerController extends Controller
 {
-    public function index(){
+    public function index(Request $request){
         try {
-            $producers = new ProducerCollection(Producer::all());
+            $producers = new ProducerCollection(Producer::visiblePara($request->user())->get());
             return ApiResponse::success ('Listado de Productores', 200, $producers);
         }catch (Exception $e){
             return ApiResponse::error($e->getMessage(), 500);
         }
     }
 
-    public function show($id)
+    public function show(Request $request, $id)
     {
         try {
-            $producer = Producer::findOrFail($id);
+            $producer = Producer::visiblePara($request->user())->findOrFail($id);
             $producer = [
                 'id'=>$producer->id,
                 'user_id'=>$producer->user_id,
@@ -56,16 +55,16 @@ class ProducerController extends Controller
                 'colonia' => 'required|max:50',
                 'cp' => 'required|max:5',
                 'municipio' => 'required|max:100',
-                'agencia' => 'max:50',
+                'agencia' => 'nullable|max:50',
                 'estado' => 'required|max:50',
                 'telPrincipal' => 'required|max:10',
-                'telSecundario' => 'max:10',
-                'user_id' => 'required|unique:producers|max:5',
+                'telSecundario' => 'nullable|max:10',
+                'user_id' => 'required|exists:users,id|unique:producers',
             ]);
             $producer = Producer::create($request->all());
-            return ApiResponse::success('Registro agregado correctamente',202,$producer);
+            return ApiResponse::success('Registro agregado correctamente',201,$producer);
         }catch (ValidationException $e) {
-            return ApiResponse::error($e->getMessage(),422);
+            return ApiResponse::error($e->getMessage(),422, $e->errors());
         }
     }
 
@@ -88,32 +87,28 @@ class ProducerController extends Controller
                 'colonia' => 'required|max:50',
                 'cp' => 'required|max:5',
                 'municipio' => 'required|max:100',
-                'agencia' => 'max:50',
+                'agencia' => 'nullable|max:50',
                 'estado' => 'required|max:50',
                 'telPrincipal' => 'required|max:10',
-                'telSecundario' => 'max:10',
-                'user_id' => ['required',Rule::unique('producers')->ignore($producer),'max:5'],
+                'telSecundario' => 'nullable|max:10',
+                'user_id' => ['required','exists:users,id',Rule::unique('producers')->ignore($producer)],
             ]);
             $producer->update($request->all());
             return ApiResponse::success('Registro actualizado', 200, $producer);
         } catch (ModelNotFoundException $e){
             return ApiResponse::error($e->getMessage(), 404);
+        } catch (ValidationException $e) {
+            return ApiResponse::error($e->getMessage(), 422, $e->errors());
         } catch (Exception $e){
             return ApiResponse::error($e->getMessage(), 422);
         }
     }
 
-    public function getProducerUserId ($user_id){
+    public function getProducerUserId (Request $request, $user_id){
         try{
-            /*$producerUserId = DB::table('producers')
-                ->where('producers.user_id',$user_id)
-                ->get();*/
-            /*$producerUserId = DB::table('producers')
-                ->join ('estanques', 'producers.id','=','estanques.producer_id')
-                ->select ('*')
-                ->where ('producers.user_id',$user_id)
-                ->get();*/
-            $producerUserId = new ProducerCollection(Producer::query()->where('user_id',$user_id)->get());
+            $producerUserId = new ProducerCollection(
+                Producer::visiblePara($request->user())->where('user_id',$user_id)->get()
+            );
             return ApiResponse::success('Registro Encontrado',200,$producerUserId);
         } catch (Exception $e) {
             return ApiResponse::error($e->getMessage(), 422);

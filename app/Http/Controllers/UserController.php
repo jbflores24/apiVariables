@@ -7,7 +7,6 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Http\Responses\ApiResponse;
-use Illuminate\Support\Facades\Hash;
 use App\Http\Resources\UserCollection;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -43,10 +42,10 @@ class UserController extends Controller
                 'name' => 'required|max:30',
                 'rfc' => 'required|unique:users|min:10|max:13',
                 'email' => 'required|unique:users|email|max:60',
-                'password' => 'required',
+                'password' => 'required|min:4',
             ]);
-            //$request->input('password') = Hash::make($request->password);
-            $user = User::create($request->all());
+            // La contraseña se cifra con el cast "hashed" del modelo
+            $user = User::create($request->only(['name', 'rfc', 'email', 'password']));
             return ApiResponse::success('Registro agregado', 201, $user);
         }catch (ValidationException $e) {
             return ApiResponse::error($e->getMessage(), 422, $e->errors());
@@ -70,12 +69,19 @@ class UserController extends Controller
                 'name' => 'required|max:30',
                 'rfc' => ['required', Rule::unique('users')->ignore($user),'min:10','max:13'],
                 'email' => ['required',Rule::unique('users')->ignore($user),'email','max:60'],
-                //'password' => 'required',
+                'password' => 'nullable|min:4',
             ]);
-            $user->update($request->all());
+            // Si no se envía contraseña se conserva la actual
+            $datos = $request->only(['name', 'rfc', 'email']);
+            if ($request->filled('password')) {
+                $datos['password'] = $request->password;
+            }
+            $user->update($datos);
             return ApiResponse::success ('Registro editado',200, $user);
         } catch (ModelNotFoundException $e) {
             return ApiResponse::error ($e->getMessage(), 404);
+        } catch (ValidationException $e) {
+            return ApiResponse::error($e->getMessage(), 422, $e->errors());
         } catch (Exception $e) {
             return ApiResponse::error ($e->getMessage(), 422);
         }
