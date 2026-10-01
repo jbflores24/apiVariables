@@ -56,4 +56,31 @@ class User extends Authenticatable
         return $this->hasMany(Register::class);
     }
 
+    public function hasRole(...$roles){
+        return $this->roles->whereIn('nombre', $roles)->isNotEmpty();
+    }
+
+    public function isAdmin(){
+        return $this->hasRole('Administrador');
+    }
+
+    /**
+     * Administradores y técnicos ven la información de todos los productores;
+     * un productor solo ve la suya.
+     */
+    public function puedeVerTodo(){
+        return $this->hasRole('Administrador', 'Técnico');
+    }
+
+    public function perfil(){
+        return [
+            'id' => $this->id,
+            'rfc' => $this->rfc,
+            'name' => $this->name,
+            'email' => $this->email,
+            'roles' => $this->roles->pluck('nombre')->values(),
+            'producer' => $this->producer,
+        ];
+    }
+
 }

@@ -6,9 +6,7 @@ use Exception;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\DB;
 use App\Http\Responses\ApiResponse;
-use Illuminate\Support\Facades\Hash;
 use App\Http\Resources\UserCollection;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -41,16 +39,16 @@ class UserController extends Controller
     public function store (Request $request){
         try {
             $request->validate([
-                'name' => 'required|max:30',
+                'name' => 'required|max:100',
                 'rfc' => 'required|unique:users|min:10|max:13',
                 'email' => 'required|unique:users|email|max:60',
-                'password' => 'required',
+                'password' => 'required|min:4',
             ]);
-            //$request->input('password') = Hash::make($request->password);
-            $user = User::create($request->all());
+            // La contraseña se cifra con el cast "hashed" del modelo
+            $user = User::create($request->only(['name', 'rfc', 'email', 'password']));
             return ApiResponse::success('Registro agregado', 201, $user);
         }catch (ValidationException $e) {
-            return ApiResponse::error($e->getMessage(), 404);
+            return ApiResponse::error($e->getMessage(), 422, $e->errors());
         }
     }
 
@@ -68,15 +66,22 @@ class UserController extends Controller
         try {
             $user = User::findOrFail($id);
             $request->validate([
-                'name' => 'required|max:30',
+                'name' => 'required|max:100',
                 'rfc' => ['required', Rule::unique('users')->ignore($user),'min:10','max:13'],
                 'email' => ['required',Rule::unique('users')->ignore($user),'email','max:60'],
-                //'password' => 'required',
+                'password' => 'nullable|min:4',
             ]);
-            $user->update($request->all());
+            // Si no se envía contraseña se conserva la actual
+            $datos = $request->only(['name', 'rfc', 'email']);
+            if ($request->filled('password')) {
+                $datos['password'] = $request->password;
+            }
+            $user->update($datos);
             return ApiResponse::success ('Registro editado',200, $user);
         } catch (ModelNotFoundException $e) {
             return ApiResponse::error ($e->getMessage(), 404);
+        } catch (ValidationException $e) {
+            return ApiResponse::error($e->getMessage(), 422, $e->errors());
         } catch (Exception $e) {
             return ApiResponse::error ($e->getMessage(), 422);
         }
@@ -84,15 +89,16 @@ class UserController extends Controller
 
     public function getProducer(){
         try{
-            $users_rol_producer = DB::table('users')
-                ->join('role_user','users.id','=','role_user.user_id')
-                ->select('*')
-                ->where('role_user.role_id',3)
+            // user_id se conserva por compatibilidad con la respuesta anterior
+            $users_rol_producer = User::select('users.*', 'users.id as user_id')
+                ->whereHas('roles', function ($query) {
+                    $query->where('nombre', 'Productor');
+                })
                 ->orderBy('users.id')
                 ->get();
             return ApiResponse::success('Listado de usuarios con el rol de productor', 200, $users_rol_producer);
-        } catch (ModelNotFoundException $e) {
-            ApiResponse::error($e->getMessage(),404);
+        } catch (Exception $e) {
+            return ApiResponse::error($e->getMessage(),500);
         }
 
     }

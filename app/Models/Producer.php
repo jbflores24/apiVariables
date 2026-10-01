@@ -28,4 +28,11 @@ class Producer extends Model
     public function estanques(){
         return $this->hasMany(Estanque::class);
     }
+
+    public function scopeVisiblePara($query, User $user){
+        if ($user->puedeVerTodo()) {
+            return $query;
+        }
+        return $query->where('user_id', $user->id);
+    }
 }
