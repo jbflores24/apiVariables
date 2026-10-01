@@ -6,7 +6,6 @@ use Exception;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\DB;
 use App\Http\Responses\ApiResponse;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Resources\UserCollection;
@@ -50,7 +49,7 @@ class UserController extends Controller
             $user = User::create($request->all());
             return ApiResponse::success('Registro agregado', 201, $user);
         }catch (ValidationException $e) {
-            return ApiResponse::error($e->getMessage(), 404);
+            return ApiResponse::error($e->getMessage(), 422, $e->errors());
         }
     }
 
@@ -84,15 +83,16 @@ class UserController extends Controller
 
     public function getProducer(){
         try{
-            $users_rol_producer = DB::table('users')
-                ->join('role_user','users.id','=','role_user.user_id')
-                ->select('*')
-                ->where('role_user.role_id',3)
+            // user_id se conserva por compatibilidad con la respuesta anterior
+            $users_rol_producer = User::select('users.*', 'users.id as user_id')
+                ->whereHas('roles', function ($query) {
+                    $query->where('nombre', 'Productor');
+                })
                 ->orderBy('users.id')
                 ->get();
             return ApiResponse::success('Listado de usuarios con el rol de productor', 200, $users_rol_producer);
-        } catch (ModelNotFoundException $e) {
-            ApiResponse::error($e->getMessage(),404);
+        } catch (Exception $e) {
+            return ApiResponse::error($e->getMessage(),500);
         }
 
     }

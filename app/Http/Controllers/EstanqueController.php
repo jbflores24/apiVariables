@@ -96,7 +96,7 @@ class EstanqueController extends Controller
         try {
             $estanque = Estanque::findOrFail($id);
             $estanque->delete();
-            return ApiResponse::error('Registro eliminado',200);
+            return ApiResponse::success('Registro eliminado',200);
         }catch(ModelNotFoundException $e){
             return ApiResponse::error($e->getMessage(),404);
         }
