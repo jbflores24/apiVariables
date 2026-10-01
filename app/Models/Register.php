@@ -27,4 +27,17 @@ class Register extends Model
     public function user(){
         return $this->belongsTo(User::class);
     }
+
+    public function scopeVisiblePara($query, User $user){
+        if ($user->puedeVerTodo()) {
+            return $query;
+        }
+        // Registros de sus estanques o capturados por el propio usuario
+        return $query->where(function ($q) use ($user) {
+            $q->where('user_id', $user->id)
+                ->orWhereHas('estanque', function ($e) use ($user) {
+                    $e->visiblePara($user);
+                });
+        });
+    }
 }

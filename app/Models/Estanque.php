@@ -22,4 +22,13 @@ class Estanque extends Model
     public function registers(){
         return $this->hasMany(Register::class);
     }
+
+    public function scopeVisiblePara($query, User $user){
+        if ($user->puedeVerTodo()) {
+            return $query;
+        }
+        return $query->whereHas('producer', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        });
+    }
 }

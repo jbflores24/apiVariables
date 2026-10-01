@@ -22,7 +22,8 @@ class RegisterResource extends JsonResource
             'variable_id'=>$this->variable_id,
             'variable'=>$this->variable,
             'user_id'=> $this->user_id,
-            'registro'=> $this->user,
+            'usuario'=> $this->user,
+            'fecha'=> $this->created_at,
         ];
     }
 }

@@ -38,7 +38,7 @@ class RoleController extends Controller
             $rol = Role::create($request->all());
             return ApiResponse::success('Registro agregado', 201, $rol);
         } catch (ValidationException $e) {
-            return ApiResponse::error($e->getMessage(),422);
+            return ApiResponse::error($e->getMessage(),422, $e->errors());
         }
     }
 
@@ -72,6 +72,8 @@ class RoleController extends Controller
             return ApiResponse::success('Registro actualizado',200,$rol);
         }catch (ModelNotFoundException $e) {
             return ApiResponse::error($e->getMessage(), 404);
+        } catch (ValidationException $e) {
+            return ApiResponse::error($e->getMessage(), 422, $e->errors());
         } catch (Exception $e) {
             return ApiResponse::error ($e->getMessage(), 422);
         }
