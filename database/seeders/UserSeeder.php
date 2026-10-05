@@ -16,34 +16,34 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         DB::table('users')->insert([
-            'rfc'=>'FOMB770810411',
-            'name'=>'JOSE BRAULIO FLORES MTZ.',
-            'email'=>'jbflores24@hotmail.com',
-            'password'=>Hash::make('1234'),
+            'rfc'=>'DDDD770810411',
+            'name'=>'Ana Torres Ramírez',
+            'email'=>'admin@example.com',
+            'password'=>Hash::make('Demo12345'),
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ]);
         DB::table('users')->insert([
             'rfc'=>'AAAA770810411',
-            'name'=>'MARIA DEL CARMEN GALLEGOS VILLALOBOS.',
-            'email'=>'maria@hotmail.com',
-            'password'=>Hash::make('1234'),
+            'name'=>'María López Hernández',
+            'email'=>'maria@example.com',
+            'password'=>Hash::make('Demo12345'),
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ]);
         DB::table('users')->insert([
             'rfc'=>'BBBB770810411',
-            'name'=>'Miguel Edgardo Flores Gallegos',
-            'email'=>'miguel@hotmail.com',
-            'password'=>Hash::make('1234'),
+            'name'=>'Miguel Sánchez Ortiz',
+            'email'=>'miguel@example.com',
+            'password'=>Hash::make('Demo12345'),
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ]);
         DB::table('users')->insert([
             'rfc'=>'CCCC770810411',
-            'name'=>'José Mauricio flores Gallegos.',
-            'email'=>'mauricio@gmail.com',
-            'password'=>Hash::make('1234'),
+            'name'=>'Mauricio Díaz Castro',
+            'email'=>'mauricio@example.com',
+            'password'=>Hash::make('Demo12345'),
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ]);

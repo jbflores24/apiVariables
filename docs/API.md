@@ -150,7 +150,7 @@ Se recomienda JSON (`Content-Type: application/json`). También se acepta `appli
 | `password` | Obligatorio |
 
 ```json
-{ "email": "miguel@hotmail.com", "password": "1234" }
+{ "email": "miguel@example.com", "password": "Demo12345" }
 ```
 
 Respuesta `200`:
@@ -165,8 +165,8 @@ Respuesta `200`:
     "user": {
       "id": 3,
       "rfc": "BBBB770810411",
-      "name": "Miguel Edgardo Flores Gallegos",
-      "email": "miguel@hotmail.com",
+      "name": "Miguel Sánchez Ortiz",
+      "email": "miguel@example.com",
       "roles": ["Productor"],
       "producer": {
         "id": 3, "calle": "Alvaro Obregón", "numero": 15, "colonia": "Refineria",
@@ -191,7 +191,7 @@ Respuesta `200`:
 | Campo | Reglas |
 |---|---|
 | `password_actual` | Obligatorio; debe coincidir con la contraseña actual |
-| `password` | Obligatorio, mínimo 4 caracteres |
+| `password` | Obligatorio, mínimo 8 caracteres |
 | `password_confirmation` | Igual a `password` |
 
 Si `password_actual` no coincide responde `422` con el error en `data.password_actual`. Si todo sale bien, **revoca los demás tokens del usuario** (cierra la sesión en otros teléfonos) y conserva el actual.
@@ -211,7 +211,7 @@ Si `password_actual` no coincide responde `422` con el error en `data.password_a
 ```json
 {
   "id": 1, "user_id": 1,
-  "usuario": { "id": 1, "rfc": "FOMB770810411", "name": "JOSE BRAULIO FLORES MTZ.", "email": "jbflores24@hotmail.com" },
+  "usuario": { "id": 1, "rfc": "DDDD770810411", "name": "Ana Torres Ramírez", "email": "admin@example.com" },
   "calle": "Donaji", "numero": 13, "colonia": "Istmeña", "cp": "70680",
   "municipio": "Salina Cruz", "agencia": "", "estado": "Oaxaca",
   "telPrincipal": "9711587416", "telSecundario": "9717163242",
@@ -239,7 +239,7 @@ Si `password_actual` no coincide responde `422` con el error en `data.password_a
 {
   "id": 1, "nombre": "Estanque A", "descripcion": "Descripción A", "producer_id": 1,
   "productor": { "id": 1, "calle": "Donaji", "...": "..." },
-  "usuario": { "id": 1, "name": "JOSE BRAULIO FLORES MTZ.", "...": "..." }
+  "usuario": { "id": 1, "name": "Ana Torres Ramírez", "...": "..." }
 }
 ```
 
@@ -279,7 +279,7 @@ GET /api/register?estanque_id=1&desde=2026-09-01&per_page=2
         "id": 431, "valor": 26, "fecha": "2026-10-03T08:38:00.000000Z",
         "estanque_id": 1, "estanque": { "id": 1, "nombre": "Estanque A", "...": "..." },
         "variable_id": 1, "variable": { "id": 1, "nombre": "Temperatura" },
-        "user_id": 2, "usuario": { "id": 2, "name": "MARIA DEL CARMEN GALLEGOS VILLALOBOS.", "...": "..." }
+        "user_id": 2, "usuario": { "id": 2, "name": "María López Hernández", "...": "..." }
       }
     ],
     "paginacion": { "pagina_actual": 1, "por_pagina": 2, "total": 108, "ultima_pagina": 54 }
@@ -383,7 +383,7 @@ Todas estas rutas son **Admin**.
 | `name` | Obligatorio, hasta 100 caracteres | Igual |
 | `rfc` | Obligatorio, de 10 a 13 caracteres, único | Igual (puede repetir el suyo) |
 | `email` | Obligatorio, correo válido, hasta 60 caracteres, único | Igual (puede repetir el suyo) |
-| `password` | Obligatorio, mínimo 4 caracteres | Opcional: si va vacío o no se envía, se conserva la actual |
+| `password` | Obligatorio, mínimo 8 caracteres | Opcional: si va vacío o no se envía, se conserva la actual |
 
 La contraseña se guarda cifrada (bcrypt). Cualquier otro campo del cuerpo se ignora. Un usuario nuevo no tiene roles: asígnalos con `/roleuser`.
 
@@ -447,7 +447,7 @@ Usuarios que tienen el rol Productor: `{ id, user_id, rfc, name, email, ... }` (
 API=http://127.0.0.1:8000/api
 
 TOKEN=$(curl -s -X POST $API/login -H "Content-Type: application/json" \
-  -d '{"email":"miguel@hotmail.com","password":"1234"}' | php -r 'echo json_decode(stream_get_contents(STDIN))->data->token;')
+  -d '{"email":"miguel@example.com","password":"Demo12345"}' | php -r 'echo json_decode(stream_get_contents(STDIN))->data->token;')
 
 # Capturar las cuatro variables del estanque 5
 curl -X POST $API/register/lote -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
