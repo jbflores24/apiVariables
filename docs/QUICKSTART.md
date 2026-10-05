@@ -57,7 +57,7 @@ Iniciar sesión:
 ```bash
 curl -X POST http://127.0.0.1:8000/api/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"jbflores24@hotmail.com","password":"1234"}'
+  -d '{"email":"admin@example.com","password":"Demo12345"}'
 ```
 
 La respuesta trae `data.token`. Úsalo en las demás rutas:
@@ -70,14 +70,14 @@ curl -H "Authorization: Bearer $TOKEN" "http://127.0.0.1:8000/api/estadisticas?e
 
 ## Usuarios de ejemplo
 
-Todos con contraseña `1234`:
+Todos con contraseña `Demo12345`:
 
 | Id | Correo | Roles | Datos de productor |
 |---|---|---|---|
-| 1 | jbflores24@hotmail.com | Administrador, Técnico | Sí (estanques A y B) |
-| 2 | maria@hotmail.com | Técnico | Sí (estanques C y D) |
-| 3 | miguel@hotmail.com | Productor | Sí (estanque E) |
-| 4 | mauricio@gmail.com | Administrador | Sí (sin estanques) |
+| 1 | admin@example.com | Administrador, Técnico | Sí (estanques A y B) |
+| 2 | maria@example.com | Técnico | Sí (estanques C y D) |
+| 3 | miguel@example.com | Productor | Sí (estanque E) |
+| 4 | mauricio@example.com | Administrador | Sí (sin estanques) |
 
 Cambia estas contraseñas, o crea usuarios nuevos y borra estos, antes de usar el sistema con datos reales.
 

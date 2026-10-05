@@ -60,7 +60,7 @@ Prueba rápida:
 ```bash
 curl -X POST http://127.0.0.1:8000/api/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"jbflores24@hotmail.com","password":"1234"}'
+  -d '{"email":"admin@example.com","password":"Demo12345"}'
 ```
 
 ## Documentación

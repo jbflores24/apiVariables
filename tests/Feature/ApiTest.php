@@ -30,8 +30,8 @@ class ApiTest extends TestCase
     public function test_login_devuelve_token_y_perfil_y_logout_lo_revoca(): void
     {
         $data = $this->postJson('/api/login', [
-            'email' => 'miguel@hotmail.com',
-            'password' => '1234',
+            'email' => 'miguel@example.com',
+            'password' => 'Demo12345',
         ])->assertOk()->json('data');
 
         $this->assertNotEmpty($data['token']);
@@ -47,7 +47,7 @@ class ApiTest extends TestCase
     public function test_login_con_credenciales_invalidas(): void
     {
         $this->postJson('/api/login', [
-            'email' => 'jbflores24@hotmail.com',
+            'email' => 'admin@example.com',
             'password' => 'incorrecta',
         ])->assertStatus(401)->assertJsonPath('error', true);
     }
@@ -91,7 +91,7 @@ class ApiTest extends TestCase
         ])->assertStatus(422)->assertJsonValidationErrors(['password_actual'], 'data');
 
         $this->putJson('/api/me/password', [
-            'password_actual' => '1234',
+            'password_actual' => 'Demo12345',
             'password' => 'nueva123',
             'password_confirmation' => 'nueva123',
         ])->assertOk();
@@ -277,13 +277,13 @@ class ApiTest extends TestCase
         $this->putJson('/api/user/2', [
             'rfc' => 'AAAA770810411',
             'name' => 'Nombre editado',
-            'email' => 'maria@hotmail.com',
+            'email' => 'maria@example.com',
             'password' => '',
         ])->assertOk();
 
         $usuario = User::find(2);
         $this->assertSame('Nombre editado', $usuario->name);
-        $this->assertTrue(Hash::check('1234', $usuario->password));
+        $this->assertTrue(Hash::check('Demo12345', $usuario->password));
     }
 
     public function test_no_se_asigna_el_mismo_rol_dos_veces(): void

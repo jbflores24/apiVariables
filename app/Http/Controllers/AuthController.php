@@ -34,7 +34,7 @@ class AuthController extends Controller
     public function cambiarPassword (Request $request){
         $request->validate([
             'password_actual' => 'required',
-            'password' => 'required|min:4|confirmed',
+            'password' => 'required|min:8|confirmed',
         ]);
         $user = $request->user();
         if (!Hash::check($request->password_actual, $user->password)) {
