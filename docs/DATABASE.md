@@ -119,7 +119,7 @@ Tabla estándar de Laravel Sanctum: un registro por sesión iniciada. `POST /log
 
 | Seeder | Contenido |
 |---|---|
-| `UserSeeder` | 4 usuarios con contraseña `1234` |
+| `UserSeeder` | 4 usuarios con contraseña `Demo12345` |
 | `RoleSeeder` | Administrador, Técnico y Productor |
 | `RolUserSeeder` | Roles de los 4 usuarios (ver [Inicio rápido](QUICKSTART.md#usuarios-de-ejemplo)) |
 | `ProducerSeeder` | Dirección de los 4 usuarios |

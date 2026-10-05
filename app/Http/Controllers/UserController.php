@@ -42,7 +42,7 @@ class UserController extends Controller
                 'name' => 'required|max:100',
                 'rfc' => 'required|unique:users|min:10|max:13',
                 'email' => 'required|unique:users|email|max:60',
-                'password' => 'required|min:4',
+                'password' => 'required|min:8',
             ]);
             // La contraseña se cifra con el cast "hashed" del modelo
             $user = User::create($request->only(['name', 'rfc', 'email', 'password']));
@@ -69,7 +69,7 @@ class UserController extends Controller
                 'name' => 'required|max:100',
                 'rfc' => ['required', Rule::unique('users')->ignore($user),'min:10','max:13'],
                 'email' => ['required',Rule::unique('users')->ignore($user),'email','max:60'],
-                'password' => 'nullable|min:4',
+                'password' => 'nullable|min:8',
             ]);
             // Si no se envía contraseña se conserva la actual
             $datos = $request->only(['name', 'rfc', 'email']);

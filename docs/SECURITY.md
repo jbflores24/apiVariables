@@ -56,7 +56,7 @@ Ambos responden `429`. Ver [Configuración](CONFIGURATION.md#límites-de-peticio
 
 ## Contraseñas de ejemplo
 
-Los seeders crean cuatro usuarios con la contraseña `1234`. **Antes de usar el sistema con datos reales**, cambia esas contraseñas desde *Mi perfil* en la app o elimina esos usuarios y crea los reales.
+Los seeders crean cuatro usuarios con la contraseña `Demo12345`. **Antes de usar el sistema con datos reales**, cambia esas contraseñas desde *Mi perfil* en la app o elimina esos usuarios y crea los reales.
 
 ## Transporte
 
